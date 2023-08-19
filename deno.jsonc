@@ -1,0 +1,9 @@
+{
+  "imports": {
+    "assert": "https://deno.land/std@0.196.0/assert/mod.ts",
+    "fmt": "https://deno.land/std@0.195.0/fmt/printf.ts"
+  },
+  "tasks": {
+    "dev": "deno run --watch main.ts"
+  }
+}
