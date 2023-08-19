@@ -47,16 +47,28 @@ export class VerificationError extends Error {
     this.fieldPath = Array.isArray(fieldPath) ? fieldPath : [fieldPath]
   }
   /**
-   * 补充父路径
+   * 补充错误属性父路径
    */
   public unshiftPath(pathFragment: string) {
     this.fieldPath.unshift(pathFragment)
   }
   /**
-   * 补充错误子路径
+   * 补充错误属性子路径
    */
   public pushPath(pathFragment: string) {
     this.fieldPath.push(pathFragment)
+  }
+  /**
+   * 设置错误消息
+   */
+  public setMessage(msg: string) {
+    this.message = msg
+  }
+  /**
+   * alias for setMessage
+   */
+  public setMsg(msg: string) {
+    this.setMessage(msg)
   }
 }
 
@@ -72,7 +84,7 @@ export class VerificationError extends Error {
  */
 export type InternalValidator = (
   value: Value,
-  rule: InternalRuleItem,
+  rules: RuleItem,
   source: SourceType,
   options?: ValidateOption,
 ) => Promise<VerificationError | undefined> | VerificationError | undefined;
@@ -111,14 +123,14 @@ export interface AnyRule extends BaseRule {
   allowWhitespace?: boolean;
   range?: [number, number?];
   pattern?: RegExp | string;
-  enum?: Array<string | number | boolean | null | undefined>;
+  enum?: Array<string | number | boolean>;
 }
 export interface StringRule extends BaseRule {
   type: "string";
   range?: [number, number?];
   pattern?: RegExp | string;
   allowWhitespace?: boolean;
-  enum?: Array<string | number | boolean | null | undefined>;
+  enum?: Array<string>;
 }
 export interface ArrayRule extends BaseRule {
   type: "array";
@@ -131,24 +143,12 @@ export interface ObjectRule extends BaseRule {
 }
 export interface EnumRule extends BaseRule {
   type: "enum";
-  enum?: Array<string | number | boolean | null | undefined>;
+  enum?: Array<string | number>;
 }
-export interface DateRule extends BaseRule {
-  type: "date";
-}
+
 export interface NumberRule extends BaseRule {
   type: "number";
   range?: [number, number?];
-}
-
-export interface RegExpRule extends BaseRule {
-  type: "regexp";
-}
-export interface BooleanRule extends BaseRule {
-  type: "boolean";
-}
-export interface FuncRule extends BaseRule {
-  type: "method";
 }
 export interface IntegerRule extends Omit<NumberRule, "type"> {
   type: "integer";
@@ -156,38 +156,23 @@ export interface IntegerRule extends Omit<NumberRule, "type"> {
 export interface FloatRule extends Omit<NumberRule, "type"> {
   type: "float";
 }
-export interface UrlRule extends BaseRule {
-  type: "url";
-}
-export interface HexRule extends BaseRule {
-  type: "hex";
-}
-export interface HexRule extends BaseRule {
-  type: "hex";
-}
-export interface EmailRule extends BaseRule {
-  type: "email";
+export interface TypeRule extends BaseRule {
+  type: "date"
+  | "regexp"
+  | "boolean"
+  | "method"
+  | "url"
+  | "hex"
+  | "hex";
 }
 
 export type RuleItem =
   | AnyRule
   | StringRule
-  | RegExpRule
   | ArrayRule
   | NumberRule
-  | BooleanRule
-  | FuncRule
   | IntegerRule
   | FloatRule
   | ObjectRule
   | EnumRule
-  | DateRule
-  | UrlRule
-  | HexRule
-  | HexRule
-  | EmailRule;
-
-export type InternalRuleItem = {
-  originalRule: RuleItem;
-  validators: InternalValidator[];
-};
+  | TypeRule

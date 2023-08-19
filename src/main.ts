@@ -1,9 +1,8 @@
-import { sprintf } from "fmt";
+
 import {
   AnyRule,
   ArrayRule,
   VerificationError,
-  InternalRuleItem,
   InternalValidator,
   ObjectRule,
   RuleItem,
@@ -30,12 +29,11 @@ function resolveRuleFieldToValidator(
     [],
   );
   if (validator) {
-    validators.push((__, v, _, s) => validator(v, s));
+    validators.push((v, _, s) => validator(v, s));
   }
   return validators;
 }
 export class Validator {
-  #internalRule: InternalRuleItem[] = [];
   static deepValidateType = ["any", "array", "object"];
   constructor(public rule: RuleItem[] | Record<string, RuleItem[]>) { }
   #formtToInternalRule(
