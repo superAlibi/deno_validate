@@ -1,16 +1,13 @@
 import { sprintf } from "fmt";
-import { InternalValidator } from "../interface.ts";
+import { InternalValidator, VerificationError } from "../interface.ts";
 import { getCustomMessage, isEmptyValue } from "../util.ts";
 import { messages } from "../messages.ts";
 
-const required: InternalValidator = (f, v, r, s) => {
-  const { originalRule } = r;
+const required: InternalValidator = (_,v, r) => {
   if (
-    originalRule.required &&
-    (!Object.prototype.hasOwnProperty.call(s, r.feild) ||
-      isEmptyValue(v, originalRule.type))
+    r.required && isEmptyValue(v, r.type)
   ) {
-    return getCustomMessage(originalRule?.message) || sprintf(messages.required, f.join("."));
+    return new VerificationError(getCustomMessage(r?.message) || sprintf(messages.required), { fieldPath: [_] });
   }
 };
 

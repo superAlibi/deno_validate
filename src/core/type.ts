@@ -1,5 +1,5 @@
 import { sprintf } from "fmt";
-import { InternalValidator, Value } from "../interface.ts";
+import { InternalValidator, Value, VerificationError } from "../interface.ts";
 import getUrlRegex from "./url.ts";
 import { messages } from "../messages.ts";
 import { getCustomMessage } from "../util.ts";
@@ -70,27 +70,24 @@ const types: Record<string, (v: Value) => boolean> = {
   },
 };
 
-const type: InternalValidator = (f, v, r) => {
-  const { originalRule: rule } = r;
-
+const type: InternalValidator = (_, v, r) => {
+  const rule = r;
   const custom = Object.keys(types);
   const ruleType = rule.type;
-
-  if (!ruleType) return messages.default;
+  if (!ruleType) return new VerificationError(messages.default, { fieldPath: [_] });
   // any can't be validate
   if (ruleType === "any") return;
   const cmsg = getCustomMessage(rule.message)
   if (custom.includes(ruleType)) {
     if (!types[ruleType]?.(v)) {
-      return cmsg || sprintf(messages.types[ruleType!], f.join("."), rule.type);
+      return new VerificationError(cmsg || sprintf(messages.types[ruleType!], rule.type), { fieldPath: [_] });
     }
     // straight typeof check
   } else if (ruleType && typeof v !== rule.type) {
-    return cmsg || sprintf(
+    return new VerificationError(cmsg || sprintf(
       messages.types[ruleType!] || "",
-      r.feildPath.join("."),
       rule.type,
-    );
+    ), { fieldPath: [_] });
   }
 };
 

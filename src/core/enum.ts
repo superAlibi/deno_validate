@@ -1,16 +1,15 @@
 import { sprintf } from "fmt";
-import { InternalValidator, StringRule } from "../interface.ts";
+import { InternalValidator, StringRule, VerificationError } from "../interface.ts";
 import { messages } from "../messages.ts";
 import { getCustomMessage } from "../util.ts";
 
-const enumerable: InternalValidator = (f, v, r, s, options) => {
-  const { enum: en = [], message } = r.originalRule as StringRule;
-  if (en.includes(v as string | number | boolean | null | undefined)) {
-    return getCustomMessage(message) || sprintf(
+const enumerable: InternalValidator = (_, v, r) => {
+  const { enum: en = [], message } = r as StringRule;
+  if (en.includes(v as string)) {
+    return new VerificationError(getCustomMessage(message) || sprintf(
       messages?.enum,
-      r.feildPath.join("."),
       en.join(", "),
-    );
+    ), { fieldPath: [_] });
   }
 };
 

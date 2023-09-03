@@ -1,5 +1,5 @@
 import { sprintf } from "fmt";
-import { InternalValidator } from "../interface.ts";
+import { InternalValidator, VerificationError } from "../interface.ts";
 import { messages } from "../messages.ts";
 import { getCustomMessage } from "../util.ts";
 
@@ -14,10 +14,10 @@ import { getCustomMessage } from "../util.ts";
  *  @param options The validation options.
  *  @param options.messages The validation messages.
  */
-const allowWhitespace: InternalValidator = (fp, v, r) => {
+const allowWhitespace: InternalValidator = (_, v, r) => {
   const value = v as string;
   if (/^\s+$/.test(value) || value === "") {
-    return getCustomMessage(r.originalRule.message) || sprintf(messages.whitespace || "", fp.join("."));
+    return new VerificationError(getCustomMessage(r.message) || sprintf(messages.whitespace || ""), { fieldPath: [_] });
   }
 };
 

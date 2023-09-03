@@ -3,12 +3,13 @@ import {
   AnyRule,
   InternalValidator,
   StringRule,
+  VerificationError,
 } from "../interface.ts";
 import { messages } from "../messages.ts";
 import { getCustomMessage } from "../util.ts";
 
 const pattern: InternalValidator = (_, v, r) => {
-  const { pattern, message } = r.originalRule as AnyRule | StringRule;
+  const { pattern, message } = r as AnyRule | StringRule;
   if (pattern) {
     const _pattern = (pattern instanceof RegExp)
       ? pattern
@@ -20,12 +21,11 @@ const pattern: InternalValidator = (_, v, r) => {
     if (_pattern.test(v as string)) {
       return;
     }
-    return getCustomMessage(message) || sprintf(
+    return new VerificationError(getCustomMessage(message) || sprintf(
       messages?.pattern?.mismatch,
-      r.feildPath.join("."),
       v,
       _pattern,
-    );
+    ), { fieldPath: [_] });
   }
 };
 

@@ -34,15 +34,15 @@ export type Value =
   | RegExp;
 
 interface VerificationErrorOption extends ErrorOptions {
-  fieldPath: string | Array<string>
+  fieldPath: string | Array<string | number>
 }
 /**
  * 校验时产生的错误信息
  */
 export class VerificationError extends Error {
-  fieldPath: string[] = []
+  fieldPath: Array<string | number> = []
   constructor(msg: string, option: VerificationErrorOption) {
-    const { cause, fieldPath } = option
+    const { cause, fieldPath } = option || {}
     super(msg, { cause: cause })
     this.fieldPath = Array.isArray(fieldPath) ? fieldPath : [fieldPath]
   }
@@ -83,6 +83,7 @@ export class VerificationError extends Error {
  *  @param options.messages The validation messages.
  */
 export type InternalValidator = (
+  key: number | string,
   value: Value,
   rules: RuleItem,
   source: SourceType,
@@ -101,6 +102,7 @@ export type InternalValidator = (
  *  @param options.messages The validation messages.
  */
 export type ValidateFunc = (
+  key: string | number,
   value: Value,
   source: Value,
 ) => ReturnType<InternalValidator>;
@@ -135,7 +137,7 @@ export interface StringRule extends BaseRule {
 export interface ArrayRule extends BaseRule {
   type: "array";
   range?: [number, number?];
-  fields?: RuleItem[] | Record<string, RuleItem[]>;
+  fields?: RuleItem[];
 }
 export interface ObjectRule extends BaseRule {
   type: "object";
