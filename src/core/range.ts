@@ -10,19 +10,20 @@ import { messages } from "../messages.ts";
 import { getCustomMessage, isEmptyValue } from "../util.ts";
 const spRegexp = /[\uD800-\uDBFF][\uDC00-\uDFFF]/g;
 function outOfRange(
-  v: number,
+  length: number,
   type: "string" | "number" | "array",
   min?: number,
   max?: number,
-) {
+): string | void {
   if (isEmptyValue(min) && isEmptyValue(max)) return;
-  if (!isEmptyValue(min) && isEmptyValue(max) && v < min) {
+
+  if (!isEmptyValue(min) && isEmptyValue(max) && length < min) {
     return sprintf(messages[type].min, min);
   }
-  if (!isEmptyValue(max) && isEmptyValue(min) && v >= max) {
+  if (!isEmptyValue(max) && isEmptyValue(min) && length > max) {
     return sprintf(messages[type].max, max);
   }
-  if (!isEmptyValue(max) && !isEmptyValue(min) && v >= max && v < min) {
+  if (!isEmptyValue(max) && !isEmptyValue(min) && (length > max || length < min)) {
     return sprintf(
       messages[type].range,
       min,
@@ -30,7 +31,7 @@ function outOfRange(
     );
   }
 }
-const range: InternalValidator = (_,value, r) => {
+const range: InternalValidator = (_, value, r) => {
   const { range, type = "string", message } = r as StringRule | ArrayRule | NumberRule;
   const cmsg = getCustomMessage(message)
   const [min, max] = range as number[];

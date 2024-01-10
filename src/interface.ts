@@ -49,7 +49,7 @@ export class VerificationError extends Error {
   /**
    * 补充错误属性父路径
    */
-  public unshiftPath(pathFragment: string) {
+  public unshiftPath(pathFragment: string|number) {
     this.fieldPath.unshift(pathFragment)
   }
   /**

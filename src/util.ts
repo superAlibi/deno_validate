@@ -1,6 +1,10 @@
-import { CustomMessage, SourceType, Value } from "./interface.ts";
-
-function isNativeStringType(type?: string) {
+import { CustomMessage, SourceType, TypeRule, Value } from "./interface.ts";
+/**
+ * 是否是内建的校验类型
+ * @param type 
+ * @returns 
+ */
+function isNativeStringType(type?: string): type is TypeRule["type"] {
   return (
     type === "string" ||
     type === "url" ||
@@ -10,10 +14,21 @@ function isNativeStringType(type?: string) {
     type === "pattern"
   );
 }
+/**
+ * 给出自定义的message
+ * @param msg 
+ * @returns 
+ */
 export function getCustomMessage(msg?: CustomMessage): string {
   if (!msg) return "";
   return typeof msg === "function" ? msg() : msg;
 }
+/**
+ * 是否是空值
+ * @param value 
+ * @param type 
+ * @returns 
+ */
 export function isEmptyValue(
   value: unknown,
   type?: string,
@@ -57,30 +72,3 @@ export function getValueFromPath(
   return v;
 }
 
-/**
- * 合并两级对象
- *  键深度两级以上无法深度clone
- * 参考类型:ValidateMessages,它只有两级属性
- * @param target
- * @param source
- * @returns
- */
-export function mergeMessage<T extends object>(
-  target: T,
-  source?: Partial<T>,
-): T {
-  if (!source) {
-    return target;
-  }
-  for (const key in source) {
-    if (Object.prototype.hasOwnProperty.call(source, key)) {
-      const sv = source[key],
-        tv = target[key],
-        OV = typeof sv === "object" && typeof tv === "object";
-      Object.assign(target, {
-        [key]: OV ? { ...tv, ...sv } : sv,
-      });
-    }
-  }
-  return target;
-}
