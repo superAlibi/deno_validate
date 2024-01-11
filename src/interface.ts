@@ -43,7 +43,7 @@ export class VerificationError extends Error {
   fieldPath: Array<string | number> = []
   constructor(msg: string, option: VerificationErrorOption) {
     const { cause, fieldPath } = option || {}
-    super(msg, { cause: cause })
+   super(msg, { cause: cause })
     this.fieldPath = Array.isArray(fieldPath) ? fieldPath : [fieldPath]
   }
   /**

@@ -33,9 +33,7 @@ export function isEmptyValue(
   value: unknown,
   type?: string,
 ): value is null | undefined {
-  if (value === undefined || value === null) {
-    return true;
-  }
+	if((value??true)){return true}
   if (type === "array" && Array.isArray(value) && !value.length) {
     return true;
   }
